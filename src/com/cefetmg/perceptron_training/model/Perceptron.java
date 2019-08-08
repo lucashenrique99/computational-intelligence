@@ -20,7 +20,7 @@ public class Perceptron {
     private Double[] weightsInitialize(int size) {
         Double[] list = new Double[size];
         for (int i = 0; i < size; i++) {
-            list[i] = Math.random() * 0.2 - Math.random() * 0.2; // range: [-0.2, 0.2]
+            list[i] = Math.random() * 0.4 - 0.2; // range: [-0.2, 0.2]
         }
         return list;
     }
@@ -56,5 +56,24 @@ public class Perceptron {
         }
 
         return output;
+    }
+
+    public Double[] getTargetBySource(Double[] source) {
+        if (source != null && this.weights != null) {
+            Double[] output = new Double[this.output];
+            for (int j = 0; j < this.output; j++) {
+                Double result = this.weights[0][j];
+                for (int i = 0; i < this.input; i++) {
+                    result += source[i] * this.weights[i + 1][j];
+                }
+                output[j] = MathFunctions.sigmoidal(result);
+            }
+            return output;
+        }
+        return  null;
+    }
+
+    public Double[][] getWeights() {
+        return weights;
     }
 }

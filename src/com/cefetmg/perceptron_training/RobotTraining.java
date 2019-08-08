@@ -2,16 +2,32 @@ package com.cefetmg.perceptron_training;
 
 import com.cefetmg.perceptron_training.model.Perceptron;
 
-import java.util.Arrays;
-
-public class AndPortTraining {
+public class RobotTraining {
 
     public static void main(String[] args) {
 
-        Double[][] source = new Double[][]{{0d, 0d}, {0d, 1d}, {1d, 0d}, {1d, 1d}};
-        Double[][] target = new Double[][]{{0d}, {0d}, {0d}, {1d}};
+        Double[][] source = new Double[][]{
+                {0d, 0d, 0d},
+                {0d, 0d, 1d},
+                {0d, 1d, 0d},
+                {0d, 1d, 1d},
+                {1d, 0d, 0d},
+                {1d, 0d, 1d},
+                {1d, 1d, 0d},
+                {1d, 1d, 1d}
+        };
+        Double[][] target = new Double[][]{
+                {1d, 1d},
+                {0d, 1d},
+                {0d, 0d},
+                {0d, 1d},
+                {1d, 0d},
+                {0d, 0d},
+                {1d, 0d},
+                {0d, 0d}
+        };
 
-        Perceptron perceptron = new Perceptron(2, 1);
+        Perceptron perceptron = new Perceptron(3,2);
 
         for (int epoch = 0; epoch < 5000; epoch++) {
             double epochError = 0;
@@ -34,10 +50,6 @@ public class AndPortTraining {
 
             System.out.println("Epoch " + epoch + ":  error: " + epochError + " \t  error classifier: " + epochErrorClassifier);
         }
-
-        Double[] sourceTest = {0d, 1d};
-        Double[] out = perceptron.getTargetBySource(sourceTest);
-        System.out.println(Arrays.toString(out));
 
     }
 
