@@ -24,9 +24,10 @@ public class OrPortTraining {
                 double sampleError = 0;
                 int sampleErrorClassifier = 0;
                 for (int j = 0; j < result.length; j++) {
+                    Double outValue = (output[j] < classifierLimit) ? 0 : 1d; // truncate value
                     Double e = Math.abs(result[j] - output[j]);;
                     sampleError += e;
-                    sampleErrorClassifier += (e < classifierLimit) ? 0 : 1;
+                    sampleErrorClassifier += Math.abs(result[j] - outValue);
                 }
                 epochError += sampleError;
                 epochErrorClassifier += sampleErrorClassifier;
