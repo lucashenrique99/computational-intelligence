@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -21,8 +20,8 @@ public class BreastCancerMLPTraining {
         Double[][] source = readFileResult.inputs;
         Double[][] target = readFileResult.targets;
 
-        MultiLayerPerceptron benignPerceptron = new MultiLayerPerceptron(9, 9,1);
-        MultiLayerPerceptron malignantPerceptron = new MultiLayerPerceptron(9, 9,1);
+        MultiLayerPerceptron benignPerceptron = new MultiLayerPerceptron(9, 9, 1);
+        MultiLayerPerceptron malignantPerceptron = new MultiLayerPerceptron(9, 9, 1);
 
         final Double learningCoefficient = 0.08d;
         final Double threshold = 0.5d;
@@ -43,7 +42,7 @@ public class BreastCancerMLPTraining {
             int sampleTrainingIndex = 0;
             for (; sampleTrainingIndex < source.length; sampleTrainingIndex++) {
                 Double[] input = source[sampleTrainingIndex];
-                Double[] output = target[sampleTrainingIndex]; // [ 1 0 0] | [0 0 1] | [0 1 0]
+                Double[] output = target[sampleTrainingIndex]; // [ 1 0] | [0 1]
 
                 Double[] benignResult = benignPerceptron.training(input, new Double[]{output[0]}, learningCoefficient);
                 Double[] malignResult = malignantPerceptron.training(input, new Double[]{output[1]}, learningCoefficient);
@@ -63,7 +62,7 @@ public class BreastCancerMLPTraining {
                 Double malignOutValue = (malignResult[0] < threshold) ? 0 : 1d; // classifier error
                 sampleErrorClassifier += Math.abs(output[1] - malignOutValue);
 
-                // group left, balance and right errors
+                // group benign and malign errors
                 epochError += sampleError;
                 epochErrorClassifier += Math.min(sampleErrorClassifier, 1);
             }
@@ -72,10 +71,6 @@ public class BreastCancerMLPTraining {
             maxEpochClassifier = Math.max(maxEpochClassifier, epochErrorClassifier);
             minEpochError = Math.min(minEpochError, epochError);
             maxEpochError = Math.max(maxEpochError, epochError);
-
-//            System.out.println("================ EPOCH " + epoch + " ====================");
-//            System.out.println("Error Training: " + epochError);
-//            System.out.println("Error Training classifier: " + epochErrorClassifier + "\t Percent: " + ((double) epochErrorClassifier / sampleTrainingIndex));
 
             System.out.print("\nEPOCH " + epoch + ": ");
             System.out.print("\tError Training: " + epochError);
@@ -86,7 +81,6 @@ public class BreastCancerMLPTraining {
             double epochTestingError = 0;
             int epochErrorTestingClassifier = 0;
             for (; sampleTestingIndex < readFileResult.testingInput.length; sampleTestingIndex++) {
-//                System.out.println("================ TEST " + sampleTestingIndex + " ====================");
                 double sampleTestingError = 0;
                 Double[] out1 = benignPerceptron.getTargetBySource(readFileResult.testingInput[sampleTestingIndex]);
                 Double[] out2 = malignantPerceptron.getTargetBySource(readFileResult.testingInput[sampleTestingIndex]);
@@ -96,18 +90,17 @@ public class BreastCancerMLPTraining {
                     epochErrorTestingClassifier++;
                 }
 
-                // left perceptron
+                // benign perceptron
                 Double benignError = Math.abs(readFileResult.testingOutput[sampleTestingIndex][0] - out1[0]); // error
                 sampleTestingError += benignError;
 
-                // balance perceptron
+                // malign perceptron
                 Double malignError = Math.abs(readFileResult.testingOutput[sampleTestingIndex][1] - out2[0]);// error
                 sampleTestingError += malignError;
 
                 epochTestingError += sampleTestingError;
             }
-//            System.out.println("Error Testing: " + epochTestingError);
-//            System.out.println("Error Testing classifier: " + epochErrorTestingClassifier + "\t Percent: " + ((double) epochErrorTestingClassifier / sampleTestingIndex));
+
             System.out.print("\tError Testing: " + epochTestingError);
             System.out.print("\tError Testing classifier: " + epochErrorTestingClassifier);
             values[1][epoch] = new Double[]{(double) epoch, ((double) epochErrorTestingClassifier / sampleTestingIndex)};
@@ -118,26 +111,12 @@ public class BreastCancerMLPTraining {
         System.out.println("Classifier -> \t min " + minEpochClassifier + " \t max " + maxEpochClassifier);
         System.out.println("Error -> \t min " + minEpochError + " \t max " + maxEpochError);
 
-//        for (int i = 0; i < readFileResult.testingInput.length; i++) {
-//            System.out.println("================ TEST " + i + " ====================");
-//            System.out.println(Arrays.toString(readFileResult.testingOutput[i]));
-//            testResults(readFileResult.testingInput[i], benignPerceptron, malignantPerceptron, rightPerceptron);
-//        }
-    }
-
-    private static void testResults(Double[] source, Perceptron p1, Perceptron p2, Perceptron p3) {
-        Double[] out1 = p1.getTargetBySource(source);
-        Double[] out2 = p2.getTargetBySource(source);
-        Double[] out3 = p3.getTargetBySource(source);
-        System.out.println("[ " + Math.round(out1[0]) + ", " + Math.round(out2[0]) + ", " + Math.round(out3[0]) + " ] ");
-//        System.out.println(Arrays.toString(out1) + Arrays.toString(out2) + Arrays.toString(out3));
     }
 
     /*
         output codifications ->
-            L -> 1 0 0
-            B -> 0 1 0
-            R -> 0 0 1
+            L -> 1 0
+            B -> 0 1
      */
     public static ReadFileResult readInputFile(boolean slitDataSet) {
         try {
@@ -215,7 +194,7 @@ public class BreastCancerMLPTraining {
             } else if (outputs[i][1] == 1) {
                 malignInput.add(inputs[i]);
                 malignOutput.add(outputs[i]);
-            }else {
+            } else {
                 System.out.println("ERROR");
             }
         }
@@ -344,17 +323,6 @@ public class BreastCancerMLPTraining {
             this.testingInput = testingInput;
             this.testingOutput = testingOutput;
         }
-    }
-
-    private static class Sample {
-        private Double[] inputs;
-        private Double[] targets;
-
-        public Sample(Double[] inputs, Double[] targets) {
-            this.inputs = inputs;
-            this.targets = targets;
-        }
-
     }
 
 }
