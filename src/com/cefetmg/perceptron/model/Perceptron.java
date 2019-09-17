@@ -1,6 +1,6 @@
-package com.cefetmg.perceptron_training.model;
+package com.cefetmg.perceptron.model;
 
-import com.cefetmg.perceptron_training.utils.MathFunctions;
+import com.cefetmg.perceptron.utils.MathFunctions;
 
 public class Perceptron {
 

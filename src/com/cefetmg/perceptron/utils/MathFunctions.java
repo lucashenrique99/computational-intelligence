@@ -1,4 +1,4 @@
-package com.cefetmg.perceptron_training.utils;
+package com.cefetmg.perceptron.utils;
 
 public class MathFunctions {
 
