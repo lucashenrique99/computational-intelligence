@@ -51,7 +51,7 @@ public class MultiLayerPerceptron {
 
         for (int j = 0; j < targets.length; j++) {
             Double u = 0d;
-            for (int i = 0; i < sourcesWithBias.length; i++) {
+            for (int i = 0; i < intermediateOutput.length; i++) {
                 u += intermediateOutput[i] * this.outputWeights[i][j];
             }
             output[j] = MathFunctions.sigmoidal(u);

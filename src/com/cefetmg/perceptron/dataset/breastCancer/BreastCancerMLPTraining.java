@@ -23,8 +23,9 @@ public class BreastCancerMLPTraining {
         MultiLayerPerceptron benignPerceptron = new MultiLayerPerceptron(9, 9, 1);
         MultiLayerPerceptron malignantPerceptron = new MultiLayerPerceptron(9, 9, 1);
 
-        final Double learningCoefficient = 0.08d;
+        final Double learningCoefficient = 0.001d;
         final Double threshold = 0.5d;
+        final double acceptedErrorRange = 0.05;
 
         double minEpochClassifier = Double.MAX_VALUE;
         double maxEpochClassifier = 0;
@@ -32,7 +33,7 @@ public class BreastCancerMLPTraining {
         double minEpochError = Double.MAX_VALUE;
         double maxEpochError = 0;
 
-        int numEpochs = 5000;
+        int numEpochs = 50000;
         Double[][][] values = new Double[2][][];
         values[0] = new Double[numEpochs][2]; // training
         values[1] = new Double[numEpochs][2]; // testing
@@ -52,13 +53,13 @@ public class BreastCancerMLPTraining {
 
                 // benign perceptron
                 Double benignError = Math.abs(benignResult[0] - output[0]); // error
-                sampleError += benignError;
+                sampleError += (benignError < acceptedErrorRange || benignError > (1 - acceptedErrorRange)) ? 0 : benignError;
                 Double benignOutValue = (benignResult[0] < threshold) ? 0 : 1d; // classifier error
                 sampleErrorClassifier += Math.abs(output[0] - benignOutValue);
 
                 // malign perceptron
                 Double malignError = Math.abs(malignResult[0] - output[1]);// error
-                sampleError += malignError;
+                sampleError += (malignError < acceptedErrorRange || malignError > (1 - acceptedErrorRange)) ? 0 : malignError;
                 Double malignOutValue = (malignResult[0] < threshold) ? 0 : 1d; // classifier error
                 sampleErrorClassifier += Math.abs(output[1] - malignOutValue);
 
@@ -92,11 +93,11 @@ public class BreastCancerMLPTraining {
 
                 // benign perceptron
                 Double benignError = Math.abs(readFileResult.testingOutput[sampleTestingIndex][0] - out1[0]); // error
-                sampleTestingError += benignError;
+                sampleTestingError += (benignError < acceptedErrorRange || benignError > (1 - acceptedErrorRange)) ? 0 : benignError;
 
                 // malign perceptron
                 Double malignError = Math.abs(readFileResult.testingOutput[sampleTestingIndex][1] - out2[0]);// error
-                sampleTestingError += malignError;
+                sampleTestingError += (malignError < acceptedErrorRange || malignError > (1 - acceptedErrorRange)) ? 0 :  malignError;
 
                 epochTestingError += sampleTestingError;
             }
@@ -123,13 +124,16 @@ public class BreastCancerMLPTraining {
             InputStreamReader ir = new InputStreamReader(new FileInputStream(new File("src/com/cefetmg/perceptron/dataset/breastCancer/files/breast-cancer-wisconsin.data")));
             BufferedReader in = new BufferedReader(ir);
 
-            int datasetSize = 699;
+            int datasetSize = 683;
 
             String line;
             Double[][] inputs = new Double[datasetSize][];
             Double[][] outputs = new Double[datasetSize][];
             int index = 0;
             while ((line = in.readLine()) != null) {
+                if (line.contains("?")) {
+                    continue;
+                }
 
                 String[] vector = line.split(",");
                 for (int i = 0; i < vector.length; i++) {

@@ -1,6 +1,5 @@
 package com.cefetmg.perceptron.dataset.breastCancer;
 
-import com.cefetmg.perceptron.model.MultiLayerPerceptron;
 import com.cefetmg.perceptron.model.Perceptron;
 import com.cefetmg.perceptron.utils.XYLineChart;
 
@@ -9,7 +8,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -24,7 +22,7 @@ public class BreastCancerTraining {
         Perceptron benignPerceptron = new Perceptron(9, 1);
         Perceptron malignantPerceptron = new Perceptron(9, 1);
 
-        final Double learningCoefficient = 0.05d;
+        final Double learningCoefficient = 0.001d;
         final Double threshold = 0.5d;
 
         double minEpochClassifier = Double.MAX_VALUE;
@@ -144,18 +142,18 @@ public class BreastCancerTraining {
             InputStreamReader ir = new InputStreamReader(new FileInputStream(new File("src/com/cefetmg/perceptron/dataset/breastCancer/files/breast-cancer-wisconsin.data")));
             BufferedReader in = new BufferedReader(ir);
 
-            int datasetSize = 699;
+            int datasetSize = 683; // clean ? entries
 
             String line;
             Double[][] inputs = new Double[datasetSize][];
             Double[][] outputs = new Double[datasetSize][];
             int index = 0;
             while ((line = in.readLine()) != null) {
+                if (line.contains("?")) {
+                    continue;
+                }
 
                 String[] vector = line.split(",");
-                for (int i = 0; i < vector.length; i++) {
-                    vector[i] = vector[i].equalsIgnoreCase("?") ? "0" : vector[i];
-                }
 
                 String className = vector[10];
 
@@ -215,7 +213,7 @@ public class BreastCancerTraining {
             } else if (outputs[i][1] == 1) {
                 malignInput.add(inputs[i]);
                 malignOutput.add(outputs[i]);
-            }else {
+            } else {
                 System.out.println("ERROR");
             }
         }
