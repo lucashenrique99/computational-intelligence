@@ -86,6 +86,33 @@ public class MultiLayerPerceptron {
         return output;
     }
 
+    public Double[][] getIntermediateWeights() {
+        final Double[][] value = new Double[this.intermediateWeights.length][this.intermediateWeights[0].length];
+        for (int i = 0; i < this.intermediateWeights.length; i++) {
+            for (int j = 0; j < this.intermediateWeights[0].length; j++) {
+                value[i][j] = this.intermediateWeights[i][j].doubleValue();
+            }
+        }
+        return value;
+    }
+
+    public void setIntermediateWeights(Double[][] intermediateWeights) {
+        this.intermediateWeights = intermediateWeights;
+    }
+
+    public Double[][] getOutputWeights() {
+        final Double[][] value = new Double[this.outputWeights.length][this.outputWeights[0].length];
+        for (int i = 0; i < this.outputWeights.length; i++) {
+            for (int j = 0; j < this.outputWeights[0].length; j++) {
+                value[i][j] = this.outputWeights[i][j].doubleValue();
+            }
+        }
+        return value;
+    }
+
+    public void setOutputWeights(Double[][] outputWeights) {
+        this.outputWeights = outputWeights;
+    }
 
     public Double[] getTargetBySource(Double[] source) {
         if (source == null) {
@@ -113,7 +140,7 @@ public class MultiLayerPerceptron {
 
         for (int j = 0; j < this.output; j++) {
             Double u = 0d;
-            for (int i = 0; i < sourcesWithBias.length; i++) {
+            for (int i = 0; i < intermediateOutput.length; i++) {
                 u += intermediateOutput[i] * this.outputWeights[i][j];
             }
             output[j] = MathFunctions.sigmoidal(u);
