@@ -2,7 +2,9 @@ package com.cefetmg.perceptron.model;
 
 import com.cefetmg.perceptron.utils.MathFunctions;
 
-public class MultiLayerPerceptron {
+import java.io.Serializable;
+
+public class MultiLayerPerceptron implements Serializable {
 
     private Integer input;
     private Integer intermediateNeurons;
